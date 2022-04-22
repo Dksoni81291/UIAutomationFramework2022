@@ -15,6 +15,15 @@ public class CartPage {
 		int i = 10;
 		System.out.println(i);
 		System.out.println("In Cart Page..");
+		
+		String f1 = "Feature 1";
+		System.out.println(f1);
+		
+		String f2 = "Feature 2";
+		System.out.println(f2);
+		
+		String f3 = "Feature 3";
+		System.out.println(f3);
 	}
 
 }
