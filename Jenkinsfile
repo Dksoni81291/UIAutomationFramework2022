@@ -1,57 +1,79 @@
-pipeline {
-    
+pipeline 
+{
     agent any
     
-    stages{
-        stage("Build"){
-            steps{
-                echo("Build project")
+    tools{
+    	maven 'maven'
+        }
+
+    stages 
+    {
+        stage('Build') 
+        {
+            steps
+            {
+                 git 'https://github.com/jglick/simple-maven-project-with-tests.git'
+                 sh "mvn -Dmaven.test.failure.ignore=true clean package"
+            }
+            post 
+            {
+                success
+                {
+                    junit '**/target/surefire-reports/TEST-*.xml'
+                    archiveArtifacts 'target/*.jar'
+                }
             }
         }
         
-        stage("Run Unit Tests"){
+        
+        stage("Deploy to QA"){
             steps{
-                echo("Run Unit test cases")
+                echo("deploy to qa")
+            }
+        }
+                
+        stage('Regression Automation Test') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    git 'https://github.com/Dksoni81291/UIAutomationFramework2022.git'
+                    sh "mvn clean install"
+                    
+                }
+            }
+        }
+                
+     
+        stage('Publish Allure Reports') {
+           steps {
+                script {
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        properties: [],
+                        reportBuildPolicy: 'ALWAYS',
+                        results: [[path: '/allure-results']]
+                    ])
+                }
             }
         }
         
-        stage("DEV Deployment"){
+        
+        stage('Publish Extent Report'){
             steps{
-                echo("Deployment on the DEV environment")
+                     publishHTML([allowMissing: false,
+                                  alwaysLinkToLastBuild: false, 
+                                  keepAll: false, 
+                                  reportDir: 'build', 
+                                  reportFiles: 'TestExecutionReport.html', 
+                                  reportName: 'HTML Extent Report', 
+                                  reportTitles: ''])
             }
         }
         
-        stage("QA Deployment"){
+        stage("Deploy to PROD"){
             steps{
-                echo("QA Deployment")
+                echo("deploy to PROD")
             }
         }
-        
-         stage("Run Regression Tests"){
-            steps{
-                echo("Regression Test Execution")
-            }
-        }
-        
-        stage("Stage Deployment"){
-            steps{
-                echo("Stage Deployment")
-            }
-        }
-        
-        stage("Sanity Test"){
-            steps{
-                echo("Sanity Test execution")
-            }
-        }
-        
-        stage("PROD Deployment"){
-            steps{
-                echo("PROD Deployment")
-            }
-        }
-        
     }
-    
-    
 }
