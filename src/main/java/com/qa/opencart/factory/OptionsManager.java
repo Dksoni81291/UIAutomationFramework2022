@@ -19,6 +19,10 @@ public class OptionsManager {
 		co = new ChromeOptions();
 		if(Boolean.getBoolean(prop.getProperty("headless"))) co.addArguments("--headless");
 		if(Boolean.getBoolean(prop.getProperty("incognito"))) co.addArguments("--incognito");
+		
+		if(Boolean.parseBoolean(prop.getProperty("remote"))) {
+			co.setPlatformName("linux");
+		}
 		return co;
 	}
 	
@@ -26,6 +30,10 @@ public class OptionsManager {
 		fo = new FirefoxOptions();
 		if(Boolean.getBoolean(prop.getProperty("headless"))) fo.addArguments("--headless");
 		if(Boolean.getBoolean(prop.getProperty("incognito"))) fo.addArguments("--incognito");
+		if(Boolean.parseBoolean(prop.getProperty("remote"))) {
+			co.setPlatformName("linux");
+		}
+		
 		return fo;
 	}
 }
